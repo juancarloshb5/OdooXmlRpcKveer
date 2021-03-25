@@ -50,7 +50,14 @@ namespace Odoo.Concrete
 
             return fields;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="read"></param>
+        /// <param name="offset">Skip records</param>
+        /// <param name="limit">The quantity of records to take</param>
+        /// <param name="order">The Order disposition Example: order:"id desc"</param>
+        /// <returns></returns>
         public IEnumerable<RpcRecord> Execute(bool read = false, int offset = 0, int limit = 0, string order = "")
         {
             if (!_rpcConnection.Login()) _rpcConnection.Login();

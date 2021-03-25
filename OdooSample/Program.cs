@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Odoo.Concrete;
+using Odoo.Extensions;
+using OdooSample.Models;
+using OdooSample.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +26,42 @@ namespace OdooSample
             //Connection
             var odooConn = new RpcConnection(rpcConnnectionSettings);
 
-            //SaleOrder
-            WriteSaleOrder(odooConn);
+            ExecutePartnerService(odooConn);
+
+
+            Console.ReadLine();
 
         }
 
+        static void CreatePartnerJuan()
+        {
+            //SaleOrder
+            //WriteSaleOrder(odooConn);
+            //var partnerRecord = GetPartner(odooConn);
+            //var partner = partnerRecord.ToEntity<Partner>();
+            ////var partner = Map.Partner(partnerRecord);
+            //var record =  CreatePartner(odooConn, "res.partner", -1);
+            //Console.WriteLine(partner.Name);
+        }
+
+        static void ExecutePartnerService(RpcConnection rpcConnection)
+        {
+            var partnerService = new PartnerService(rpcConnection);
+
+            var partners = partnerService.SearchAndRead();
+        }
+        static RpcRecord CreatePartner(RpcConnection rpcConnection, string model, int? id)
+        {
+            var partner = new Partner()
+            {
+                Name = "Juan Carlos",
+                Street = "Calle Sana"
+            };
+
+            var recordPartner =  partner.ToRpcRecord(rpcConnection, model, id);
+            recordPartner.Save();
+            return recordPartner;
+        }
         //Sale Order - Oluşturma
         static RpcRecord WriteSaleOrder(RpcConnection conn)
         {
@@ -41,14 +75,14 @@ namespace OdooSample
             {
                 new RpcField{FieldName = "company_id", Value = _companyId },
                 new RpcField{FieldName = "currency_id", Value = 31},
-                new RpcField{FieldName = "date_order", Value = "2021-01-28"},
+                new RpcField{FieldName = "date_order", Value = "2021-01-28"}, // posible
                 new RpcField{FieldName = "name", Value = "Örnek Sipariş No:" + rnd.Next(1,10000).ToString()},
                 new RpcField{FieldName = "partner_id", Value = partner.Id},
                 new RpcField{FieldName = "partner_invoice_id", Value = partner.Id},
                 new RpcField{FieldName = "partner_shipping_id", Value = partner.Id},
                 new RpcField{FieldName = "picking_policy", Value = "one"},
                 new RpcField{FieldName = "pricelist_id", Value = 1},
-                new RpcField{FieldName = "warehouse_id", Value = 5},
+                new RpcField{FieldName = "warehouse_id", Value = 1},
                 new RpcField{FieldName = "state", Value = "sale"}, //Onaylı Sipariş ise
                 new RpcField{FieldName = "order_line", Value =  orderLine.ToArray() }
             });
@@ -64,7 +98,7 @@ namespace OdooSample
             var orderLine = new List<object>();
 
             //Ürün 1
-            var product = GetSearchProductByDefaultCode(conn, "10.RF.091.00");
+            var product = GetSearchProductByDefaultCode(conn, "FURN_6741");
 
             RpcRecord record = new RpcRecord(conn, "sale.order.line", -1, new List<RpcField>
             {
@@ -73,13 +107,13 @@ namespace OdooSample
                 new RpcField{FieldName = "price_unit", Value = 12.45},
                 new RpcField{FieldName = "product_uom_qty", Value = 5},
                 new RpcField{FieldName = "product_id", Value = product.Id},
-                new RpcField{FieldName = "tax_id", Value = product.GetField("taxes_id").Value},
+                //new RpcField{FieldName = "tax_id", Value = product.GetField("taxes_id").Value},
             });
             orderLine.Add(new object[] { 0, 0, record.GetRecord() });
 
 
             //Ürün 2
-            var product2 = GetSearchProductByDefaultCode(conn, "10.RF.085.00");
+            var product2 = GetSearchProductByDefaultCode(conn, "FURN_5555");
 
             RpcRecord record2 = new RpcRecord(conn, "sale.order.line", -1, new List<RpcField>
             {
@@ -88,13 +122,13 @@ namespace OdooSample
                 new RpcField{FieldName = "price_unit", Value = 65.75},
                 new RpcField{FieldName = "product_uom_qty", Value = 12},
                 new RpcField{FieldName = "product_id", Value = product2.Id},
-                new RpcField{FieldName = "tax_id", Value = product2.GetField("taxes_id").Value},
+                //new RpcField{FieldName = "tax_id", Value = product2.GetField("taxes_id").Value},
             });
             orderLine.Add(new object[] { 0, 0, record2.GetRecord() });
 
 
             //Ürün 3
-            var product3 = GetSearchProductByDefaultCode(conn, "10.RF.014.00");
+            var product3 = GetSearchProductByDefaultCode(conn, "FURN_0789");
 
             RpcRecord record3 = new RpcRecord(conn, "sale.order.line", -1, new List<RpcField>
             {
@@ -103,7 +137,7 @@ namespace OdooSample
                 new RpcField{FieldName = "price_unit", Value = 165.75},
                 new RpcField{FieldName = "product_uom_qty", Value = 8},
                 new RpcField{FieldName = "product_id", Value = product3.Id},
-                new RpcField{FieldName = "tax_id", Value = product3.GetField("taxes_id").Value},
+                //new RpcField{FieldName = "tax_id", Value = product3.GetField("taxes_id").Value},
             });
             orderLine.Add(new object[] { 0, 0, record3.GetRecord() });
 
@@ -131,6 +165,12 @@ namespace OdooSample
             return data.FirstOrDefault();
         }
 
+        static RpcRecord GetPartner(RpcConnection rpcConnection)
+        {
+            var rpcContext = new RpcContext(rpcConnection, "res.partner");
+            var data = rpcContext.Execute(true);
+            return data.FirstOrDefault();
+        }
 
         // İş Ortağı Oluşturma
         static RpcRecord CreatePartner(RpcConnection conn)

@@ -8,7 +8,7 @@ namespace Odoo.Abstract
     public interface IObjectRpc : IXmlRpcProxy
     {
         [XmlRpcMethod("execute")]
-        int create(String dbName, int userId, string dbPwd, string model, string method, XmlRpcStruct fieldValues);
+        int create(string dbName, int userId, string dbPwd, string model, string method, XmlRpcStruct fieldValues);
 
         [XmlRpcMethod("execute")]
         int[] search(string dbName, int userId, string dbPwd, string model, string method, object[] filter, int offset, int limit, string order);
