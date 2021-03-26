@@ -26,13 +26,15 @@ namespace OdooSample
             //Connection
             var odooConn = new RpcConnection(rpcConnnectionSettings);
 
-            ExecutePartnerService(odooConn);
+            //ExecutePartnerService(odooConn);
 
-            var result =  CreatePartnerService(odooConn);
-            if (result > 0)
-                Console.WriteLine("Successs");
+            //var result =  CreatePartnerService(odooConn);
+            //if (result > 0)
+            //    Console.WriteLine("Successs");
 
+            var result = EditPartner(odooConn);
 
+            //var result = new PartnerService(odooConn).Remove(50);
             Console.ReadLine();
 
         }
@@ -66,7 +68,16 @@ namespace OdooSample
         {
             var partnerService = new PartnerService(rpcConnection);
 
-            var partners = partnerService.SearchAndRead();
+            var partners = partnerService.SearchAndRead(new RpcFilter().Equal("parent_id",11));
+        }
+
+        static bool EditPartner(RpcConnection rpcConnection)
+        {
+            var partnerService = new PartnerService(rpcConnection);
+            var partner = partnerService.Get(46);
+            partner.Email = "jhernandez@gmail.com";
+            partner.CountryId = 61;
+            return partnerService.Write(46, partner);
         }
         static RpcRecord CreatePartner(RpcConnection rpcConnection, string model, int? id)
         {
