@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Odoo.Concrete
 {
-    public class RpcService<TEntity>
+    public class RpcService<TEntity> where TEntity : class
     {
         private readonly RpcConnection connection;
         private readonly string model;
@@ -22,19 +22,21 @@ namespace Odoo.Concrete
             propertiesName = typeof(TEntity).GetPropertiesName();
         }
 
-        public IEnumerable<TEntity> SearchAndRead()
+        public IEnumerable<TEntity> SearchAndRead() 
         {
-            var entitesObject = connection.SearchAndRead(model, new RpcFilter().ToArray(), propertiesName);
-
-            return new List<TEntity>();
+            var entitesObject = connection.SearchAndRead(model, new RpcFilter().ToArray(), propertiesName).ToXmlRpcStructList();
+            var entities = entitesObject.ToEntityList<TEntity>();
+            return entities;
 
         }
-        public IEnumerable<TEntity> SearchAndRead(RpcFilter filter)
+
+        public int Create(TEntity entity)
         {
-           var entitesObject =  connection.SearchAndRead(model, filter.ToArray(), propertiesName);
-
-            return new List<TEntity>();
-
+            var propertiesName = typeof(TEntity).GetPropertiesName().ToLowerAndSplitWithUnderscore();
+            var entityStruct = entity.ToXmlRpcStruct().NotNull(propertiesName);
+            return connection.Create(model, entityStruct);
         }
+
+
     }
 }

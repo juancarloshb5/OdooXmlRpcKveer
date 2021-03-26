@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CookComputing.XmlRpc;
+using System;
+using System.Collections.Generic;
 
 namespace Odoo.Extensions
 {
@@ -20,6 +22,22 @@ namespace Odoo.Extensions
             return value;
         }
 
+        public static List<XmlRpcStruct> ToXmlRpcStructList(this object[] values)
+        {
+            var list = new List<XmlRpcStruct>();
+            foreach (var value in values)
+            {
+                var item = (XmlRpcStruct)value;
+                list.Add(item);
+            }
+            return list;
+        }
         
+
+
+
+
     }
+
+    
 }

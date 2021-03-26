@@ -65,6 +65,8 @@ namespace Odoo.Extensions
             return entity;
 
         }
+       
+
 
 
         public static XmlRpcStruct ToXmlRpcStruct(this IEnumerable<RpcField> fields)

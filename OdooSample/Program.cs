@@ -28,6 +28,10 @@ namespace OdooSample
 
             ExecutePartnerService(odooConn);
 
+            var result =  CreatePartnerService(odooConn);
+            if (result > 0)
+                Console.WriteLine("Successs");
+
 
             Console.ReadLine();
 
@@ -42,6 +46,20 @@ namespace OdooSample
             ////var partner = Map.Partner(partnerRecord);
             //var record =  CreatePartner(odooConn, "res.partner", -1);
             //Console.WriteLine(partner.Name);
+        }
+
+        static int CreatePartnerService(RpcConnection rpcConnection)
+        {
+            var leslie = new Partner
+            {
+                Name = "Leslie Morel",
+                Active = true,
+                Street = "Calle Rafael",
+            };
+            var partnerService = new PartnerService(rpcConnection);
+            var result = partnerService.Create(leslie);
+            return result;
+
         }
 
         static void ExecutePartnerService(RpcConnection rpcConnection)
